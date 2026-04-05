@@ -1,0 +1,30 @@
+{
+  "name": "3018_final_project_xu_wei",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rrc-w2025-wxu/3018_final_project_xu_wei.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rrc-w2025-wxu/3018_final_project_xu_wei/issues"
+  },
+  "homepage": "https://github.com/rrc-w2025-wxu/3018_final_project_xu_wei#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
