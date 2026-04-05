@@ -1,4 +1,6 @@
 import express from "express";
+import setupSwagger from "../config/swagger";
+
 import {
     accessLogger,
     errorLogger,
@@ -12,6 +14,9 @@ import morgan from "morgan";
  * Initialize Express application
  */
 const app = express();
+
+// Initialize Swagger API documentation
+setupSwagger(app);
 
 app.use(morgan("combined"));
 /**
