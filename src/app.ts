@@ -6,12 +6,14 @@ import {
 } from "./api/v1/middleware/logger";
 import errorHandler from "./api/v1/middleware/errorHandler";
 import router from "../src/api/v1/routes/Routes";
+import morgan from "morgan";
 
 /**
  * Initialize Express application
  */
 const app = express();
 
+app.use(morgan("combined"));
 /**
  * Development logger
  * 
