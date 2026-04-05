@@ -12,7 +12,6 @@ import HealthCheck_router from "../src/api/v1/routes/HealthCheck_Routes";
 import Order_router from "../src/api/v1/routes/Order_Routes";
 import Payment_router from "../src/api/v1/routes/Payment_Routes";
 import Product_router from "../src/api/v1/routes/Product_Routes";
-import User_router from "../src/api/v1/routes/User_Routes";
 
 /**
  * Initialize Express application
@@ -60,7 +59,6 @@ app.use("/api/v1", HealthCheck_router);
 app.use("/api/v1", Order_router);
 app.use("/api/v1", Payment_router);
 app.use("/api/v1", Product_router);
-app.use("/api/v1", User_router);
 
 /**
  * Global error handling middleware
