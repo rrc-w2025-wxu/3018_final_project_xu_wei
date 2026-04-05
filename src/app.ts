@@ -1,5 +1,6 @@
 import express from "express";
 import setupSwagger from "../config/swagger";
+import morgan from "morgan";
 
 import {
     accessLogger,
@@ -7,8 +8,11 @@ import {
     consoleLogger,
 } from "./api/v1/middleware/logger";
 import errorHandler from "./api/v1/middleware/errorHandler";
-import router from "../src/api/v1/routes/Routes";
-import morgan from "morgan";
+import HealthCheck_router from "../src/api/v1/routes/HealthCheck_Routes";
+import Order_router from "../src/api/v1/routes/Order_Routes";
+import Payment_router from "../src/api/v1/routes/Payment_Routes";
+import Product_router from "../src/api/v1/routes/Product_Routes";
+import User_router from "../src/api/v1/routes/User_Routes";
 
 /**
  * Initialize Express application
@@ -52,7 +56,11 @@ app.use(express.json());
  * 
  * All endpoints defined in the router are prefixed with `/api/v1`.
  */
-app.use("/api/v1", router);
+app.use("/api/v1", HealthCheck_router);
+app.use("/api/v1", Order_router);
+app.use("/api/v1", Payment_router);
+app.use("/api/v1", Product_router);
+app.use("/api/v1", User_router);
 
 /**
  * Global error handling middleware

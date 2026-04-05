@@ -1,5 +1,6 @@
 import express from "express";
-import { itemsHealthCheck } from "../controllers/Controller";
+import { itemsHealthCheck } from "../controllers/HealthCheck_Controller";
+
 const router = express.Router();
 
 /**
@@ -33,6 +34,7 @@ const router = express.Router();
  *                   example: "Database connection failed"
  */
 router.get("/health", itemsHealthCheck);
+
 
 
 export default router;

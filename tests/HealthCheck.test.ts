@@ -1,4 +1,4 @@
-import { itemsHealthCheck } from "../src/api/v1/controllers/Controller";
+import { itemsHealthCheck } from "../src/api/v1/controllers/Product_Controller";
 import { Request, Response } from "express";
 
 describe("itemsHealthCheck", () => {

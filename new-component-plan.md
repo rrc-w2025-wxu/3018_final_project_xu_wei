@@ -4,7 +4,7 @@
 This is an e-commerce backend system. This system will implement 
 the main e-commerce business processes, including creating products, 
 displaying products, querying products, deleting products, creating 
-orders, placing orders, and making payments.
+orders, placing orders, making payments and user management.
 
 Based on the characteristics of the e-commerce system, I have chosen 
 to integrate the following three backend components:
@@ -45,15 +45,15 @@ It can deploy my e-commerce backend online. Users can access my
 application in real-world traffic to test performance.
 
  - Prepare the project
-    - Add the start script to package.json
-    - Ensure the .env file contains Firebase environment variables
+    - Add the start script to package.json.
+    - Ensure the .env file contains Firebase environment variables.
 
  - Choose a platform
-    - Render.com or Vercel
-    - Configure environment variables in the platform's management interface
+    - Render.com or Vercel.
+    - Configure environment variables in the platform's management interface.
 
  - Deployment process
-    - Push code to GitHub
+    - Push code to GitHub.
     - Create a new Node.js service in Render/Vercel and bind the repository
-    - Set up build & start commands
-    - Obtain the public API URL after deployment
+    - Set up build & start commands.
+    - Obtain the public API URL after deployment.

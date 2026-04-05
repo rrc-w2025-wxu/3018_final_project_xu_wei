@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase-admin/firestore";
-import { OrderItem } from "./OrderItem";
+import { OrderItem } from "../models/Order_Item_Model";
 
 export interface Order {
   id?: string;              // Firestore document ID (auto-generated)
