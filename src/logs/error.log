@@ -1,1 +1,4 @@
 ::1 - - [05/Apr/2026:16:58:59 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "http://localhost:3001/api/v1/health" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+::1 - - [05/Apr/2026:18:05:57 +0000] "GET /api-docs HTTP/1.1" 404 147 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+::1 - - [05/Apr/2026:18:07:04 +0000] "GET /api-docs HTTP/1.1" 404 147 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+::1 - - [05/Apr/2026:18:07:05 +0000] "GET /api-docs HTTP/1.1" 404 147 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"

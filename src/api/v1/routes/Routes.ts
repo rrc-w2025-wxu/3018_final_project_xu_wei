@@ -3,9 +3,34 @@ import { itemsHealthCheck } from "../controllers/Controller";
 const router = express.Router();
 
 /**
- * Health Check
- * GET /api/v1/health
- * Public endpoint to check if the service is running.
+ * @openapi
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Returns the health status of the items service. Used for monitoring.
+ *     tags:
+ *       - Health
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Database connection failed"
  */
 router.get("/health", itemsHealthCheck);
 
