@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/rrc-w2025-wxu/3018_final_project_xu_wei#readme",
   "devDependencies": {
+    "@redocly/cli": "^2.25.4",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
