@@ -31,10 +31,10 @@ It also allows users to analyze e-commerce user behavior (e.g., which
 products have high traffic) and determine which APIs need optimization.
 
  - Create middleware.
-Record the start time of each request.
-Record the API path, method, status code, and execution time after the 
+ -- Record the start time of each request.
+ -- Record the API path, method, status code, and execution time after the
 response is completed.
-Option to write to a log file or database (such as Firestore's api_logs 
+ -- Option to write to a log file or database (such as Firestore's api_logs 
 collection).
 
  - Apply globally.
@@ -45,15 +45,15 @@ It can deploy my e-commerce backend online. Users can access my
 application in real-world traffic to test performance.
 
  - Prepare the project
-Add the start script to package.json
-Ensure the .env file contains Firebase environment variables
+ -- Add the start script to package.json
+ -- Ensure the .env file contains Firebase environment variables
 
  - Choose a platform
-Render.com or Vercel
-Configure environment variables in the platform's management interface
+ -- Render.com or Vercel
+ -- Configure environment variables in the platform's management interface
 
  - Deployment process
-Push code to GitHub
-Create a new Node.js service in Render/Vercel and bind the repository
-Set up build & start commands
-Obtain the public API URL after deployment
+ -- Push code to GitHub
+ -- Create a new Node.js service in Render/Vercel and bind the repository
+ -- Set up build & start commands
+ -- Obtain the public API URL after deployment
