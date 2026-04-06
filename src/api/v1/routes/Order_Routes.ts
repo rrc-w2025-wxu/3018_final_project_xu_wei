@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  ordersHealthCheck,
   createOrderController,
   getAllOrdersController,
   getOrderController,
@@ -160,9 +159,9 @@ router.put("/orders/:id", updateOrderController);
 /**
  * @swagger
  * /api/v1/orders/{id}:
- *   put:
- *     summary: Update an existing order
- *     description: Updates fields of an existing order by ID.
+ *   delete:
+ *     summary: Delete an order by ID
+ *     description: Deletes an existing order and returns the deleted order data.
  *     tags:
  *       - Orders
  *     parameters:
@@ -172,15 +171,9 @@ router.put("/orders/:id", updateOrderController);
  *         description: Order ID
  *         schema:
  *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Order'
  *     responses:
  *       200:
- *         description: Order updated successfully
+ *         description: Order deleted successfully
  *         content:
  *           application/json:
  *             schema:
@@ -190,6 +183,6 @@ router.put("/orders/:id", updateOrderController);
  *       500:
  *         description: Internal server error
  */
-router.put("/orders/:id", updateOrderController);
+router.delete("/orders/:id", deleteOrderController);
 
 export default router;
