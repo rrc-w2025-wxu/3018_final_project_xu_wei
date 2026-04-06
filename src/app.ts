@@ -60,7 +60,6 @@ app.use("/api/v1", HealthCheck_router);
 app.use("/api/v1", Order_router);
 app.use("/api/v1", Payment_router);
 app.use("/api/v1", Product_router);
-app.use("/api/v1", User_router);
 
 /**
  * Global error handling middleware
