@@ -1,5 +1,11 @@
 import express from "express";
-import { createPaymentController } from "../controllers/Payment_Controller";
+import {
+    createPaymentController,
+    getAllPaymentsController,
+    getPaymentController,
+    updatePaymentController,
+    deletePaymentController,
+} from "../controllers/Payment_Controller";
 
 const router = express.Router();
 
@@ -71,6 +77,136 @@ const router = express.Router();
  *         description: Missing required fields or payment failed
  */
 router.post("/payments", createPaymentController)
+
+/**
+ * @swagger
+ * /payments:
+ *   get:
+ *     summary: Retrieve all payments
+ *     tags: [Payments]
+ *     responses:
+ *       200:
+ *         description: A list of payments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 count:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Payment'
+ *       500:
+ *         description: Server error
+ */
+router.get("/payments", getAllPaymentsController);
+
+/**
+ * @swagger
+ * /payments/{id}:
+ *   get:
+ *     summary: Retrieve a payment by ID
+ *     tags: [Payments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Payment ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Payment retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Payment'
+ *       404:
+ *         description: Payment not found
+ *       500:
+ *         description: Server error
+ */
+router.get("/payments/:id", getPaymentController);
+
+/**
+ * @swagger
+ * /payments/{id}:
+ *   put:
+ *     summary: Update a payment by ID
+ *     tags: [Payments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Payment ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Payment'
+ *     responses:
+ *       200:
+ *         description: Payment updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Payment'
+ *       404:
+ *         description: Payment not found
+ *       500:
+ *         description: Server error
+ */
+router.put("/payments/:id", updatePaymentController);
+
+/**
+ * @swagger
+ * /payments/{id}:
+ *   delete:
+ *     summary: Delete a payment by ID
+ *     tags: [Payments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Payment ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Payment deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Payment'
+ *       404:
+ *         description: Payment not found
+ *       500:
+ *         description: Server error
+ */
+router.delete("/payments/:id", deletePaymentController);
+
 
 
 export default router;
