@@ -35,7 +35,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.post("/orders", createOrderController)
+router.post("/", createOrderController)
 
 /**
  * @swagger
@@ -90,7 +90,7 @@ router.post("/orders", createOrderController)
  *       500:
  *         description: Internal server error
  */
-router.get("/orders", getAllOrdersController);
+router.get("/", getAllOrdersController);
 
 /**
  * @swagger

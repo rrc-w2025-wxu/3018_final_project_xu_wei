@@ -57,10 +57,10 @@ app.use(express.json());
  * All endpoints defined in the router are prefixed with `/api/v1`.
  */
 app.use("/api/v1", HealthCheck_router);
-app.use("/api/v1/order", Order_router);
-app.use("/api/v1/payment", Payment_router);
-app.use("/api/v1/product", Product_router);
-app.use("/api/v1/cart", Cart_router);
+app.use("/api/v1/orders", Order_router);
+app.use("/api/v1/payments", Payment_router);
+app.use("/api/v1/products", Product_router);
+app.use("/api/v1/carts", Cart_router);
 
 /**
  * Global error handling middleware

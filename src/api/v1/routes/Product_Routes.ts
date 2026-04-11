@@ -46,7 +46,7 @@ const router = express.Router();
  *       400:
  *         description: Invalid input
  */
-router.post("/products", createProductController)
+router.post("/", createProductController)
 
 /**
  * @swagger
@@ -85,7 +85,7 @@ router.post("/products", createProductController)
  *                   type: string
  *                   example: Unknown error
  */
-router.get("/products", getAllProductsController);
+router.get("/", getAllProductsController);
 
 /**
  * @swagger
@@ -137,7 +137,7 @@ router.get("/products", getAllProductsController);
  *                   type: string
  *                   example: Unknown error
  */
-router.get("/products/:id", getProductController);
+router.get("/:id", getProductController);
 
 /**
  * @swagger
@@ -212,7 +212,7 @@ router.get("/products/:id", getProductController);
  *                   type: string
  *                   example: Unknown error
  */
-router.put("/products/:id", updateProductController);
+router.put("/:id", updateProductController);
 
 /**
  * @swagger
@@ -264,6 +264,6 @@ router.put("/products/:id", updateProductController);
  *                   type: string
  *                   example: Unknown error
  */
-router.delete("/products/:id", deleteProductController);
+router.delete("/:id", deleteProductController);
 
 export default router;

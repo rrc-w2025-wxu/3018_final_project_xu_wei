@@ -76,7 +76,7 @@ const router = express.Router();
  *       400:
  *         description: Missing required fields or payment failed
  */
-router.post("/payments", createPaymentController)
+router.post("/", createPaymentController)
 
 /**
  * @swagger
@@ -103,7 +103,7 @@ router.post("/payments", createPaymentController)
  *       500:
  *         description: Server error
  */
-router.get("/payments", getAllPaymentsController);
+router.get("/", getAllPaymentsController);
 
 /**
  * @swagger
