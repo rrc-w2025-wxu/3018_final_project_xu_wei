@@ -85,27 +85,17 @@ export const getAllProductsService = async (): Promise<Product[]> => {
  */
 export const getProductService = async (id: string): Promise<Product | null> => {
     try {
-        const doc = await productRepository.getProductById("products", id);
-        if (!doc || !doc.exists) return null;
+        const product = await productRepository.getProductById(id);
 
-        const data = doc.data();
-        if (!data) return null;
+        if (!product) return null;
 
-        return {
-        id: doc.id,
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        stock: data.stock,
-        category: data.category,
-        createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : data.createdAt,
-        updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : data.updatedAt,
-        } as Product;
+        return product;
+
     } catch (error: unknown) {
         if (error instanceof Error) {
-        throw new Error(`Failed to retrieve product: ${error.message}`);
+            throw new Error(`Failed to retrieve product: ${error.message}`);
         } else {
-        throw new Error("Failed to retrieve product: Unknown error");
+            throw new Error("Failed to retrieve product: Unknown error");
         }
     }
 };
@@ -117,30 +107,29 @@ export const getProductService = async (id: string): Promise<Product | null> => 
  * @returns Returns the updated Product object, or null if product does not exist
  * @throws Throws an error if update fails
  */
-export const updateProductService = async (id: string, data: Partial<Product>): Promise<Product | null> => {
+export const updateProductService = async (
+    id: string,
+    data: Partial<Product>
+): Promise<Product | null> => {
     try {
-        const doc = await productRepository.getProductById("products", id);
-        if (!doc || !doc.exists) return null;
+        const product = await productRepository.getProductById(id);
 
-        const existingData = doc.data()!;
+        if (!product) return null;
+
         const updatedProduct: Product = {
-        id: doc.id,
-        name: data.name ?? existingData.name,
-        description: data.description ?? existingData.description,
-        price: data.price ?? existingData.price,
-        stock: data.stock ?? existingData.stock,
-        category: data.category ?? existingData.category,
-        createdAt: existingData.createdAt,
-        updatedAt: Timestamp.now(),
+            ...product,
+            ...data,
+            updatedAt: Timestamp.now()
         };
 
-        await productRepository.updateProduct<Product>("products", id, updatedProduct);
+        await productRepository.updateProduct("products", id, updatedProduct);
+
         return updatedProduct;
     } catch (error: unknown) {
         if (error instanceof Error) {
-        throw new Error(`Failed to update product: ${error.message}`);
+            throw new Error(`Failed to update product: ${error.message}`);
         } else {
-        throw new Error("Failed to update product: Unknown error");
+            throw new Error("Failed to update product: Unknown error");
         }
     }
 };
@@ -153,19 +142,11 @@ export const updateProductService = async (id: string, data: Partial<Product>): 
  */
 export const deleteProduct = async (id: string): Promise<Product | null> => {
     try {
-        const doc = await productRepository.getProductById("products", id);
-        if (!doc || !doc.exists) return null;
+        const product = await productRepository.getProductById(id);
+        if (!product) return null;
 
-        const data = doc.data()!;
         const deletedProduct: Product = {
-        id: doc.id,
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        stock: data.stock,
-        category: data.category,
-        createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : data.createdAt,
-        updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : data.updatedAt,
+            ...product
         };
 
         await productRepository.deleteProduct("products", id);
