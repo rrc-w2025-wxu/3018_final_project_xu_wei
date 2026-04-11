@@ -1,4 +1,5 @@
 import { db } from "../../../../config/firebaseConfig";
+import { Product } from "../models/Product_Model";
 
 /**
  * Creates a new document in a specified Firestore collection.
@@ -57,22 +58,16 @@ export const getProducts = async (
  * @returns {Promise<FirebaseFirestore.DocumentSnapshot | null>} - The document or null if it doesn't exist.
  */
 export const getProductById = async (
-    collectionName: string,
     id: string
-): Promise<FirebaseFirestore.DocumentSnapshot | null> => {
-    try {
-        const doc: FirebaseFirestore.DocumentSnapshot = await db
-            .collection(collectionName)
-            .doc(id)
-            .get();
-        return doc?.exists ? doc : null;
-    } catch (error: unknown) {
-        const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-        throw new Error(
-            `Failed to fetch document ${id} from ${collectionName}: ${errorMessage}`
-        );
-    }
+): Promise<Product | null> => {
+    const doc = await db.collection("products").doc(id).get();
+
+    if (!doc.exists) return null;
+
+    return {
+        id: doc.id,
+        ...doc.data()
+    } as Product;
 };
 
 /**
