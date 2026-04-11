@@ -5,6 +5,7 @@ import {
     getPaymentController,
     updatePaymentController,
     deletePaymentController,
+    payOrderController,
 } from "../controllers/Payment_Controller";
 
 const router = express.Router();
@@ -135,7 +136,7 @@ router.get("/", getAllPaymentsController);
  *       500:
  *         description: Server error
  */
-router.get("/payments/:id", getPaymentController);
+router.get("/:id", getPaymentController);
 
 /**
  * @swagger
@@ -173,7 +174,7 @@ router.get("/payments/:id", getPaymentController);
  *       500:
  *         description: Server error
  */
-router.put("/payments/:id", updatePaymentController);
+router.put("/:id", updatePaymentController);
 
 /**
  * @swagger
@@ -205,8 +206,9 @@ router.put("/payments/:id", updatePaymentController);
  *       500:
  *         description: Server error
  */
-router.delete("/payments/:id", deletePaymentController);
+router.delete("/:id", deletePaymentController);
 
 
+router.post("/pay", payOrderController);
 
 export default router;

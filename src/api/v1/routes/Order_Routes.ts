@@ -119,7 +119,7 @@ router.get("/", getAllOrdersController);
  *       500:
  *         description: Internal server error
  */
-router.get("/orders/:id", getOrderController);
+router.get("/:id", getOrderController);
 
 /**
  * @swagger
@@ -154,7 +154,7 @@ router.get("/orders/:id", getOrderController);
  *       500:
  *         description: Internal server error
  */
-router.put("/orders/:id", updateOrderController);
+router.put("/:id", updateOrderController);
 
 /**
  * @swagger
@@ -183,6 +183,6 @@ router.put("/orders/:id", updateOrderController);
  *       500:
  *         description: Internal server error
  */
-router.delete("/orders/:id", deleteOrderController);
+router.delete("/:id", deleteOrderController);
 
 export default router;
