@@ -1,8 +1,8 @@
 import express from "express";
-import { createUserController } from "../controllers/User_Controller";
+import { getCartController, addToCartController, updateItemController, deleteItemController } from "../controllers/Cart_Controller";
 
 
-const router = express.Router();
+const Cart_router = express.Router();
 
 /**
  * @swagger
@@ -34,9 +34,15 @@ const router = express.Router();
  *       400:
  *         description: Invalid input
  */
-router.post("/users", createUserController)
+Cart_router.get("/", getCartController);
 
 
+Cart_router.post("/add", addToCartController);
 
 
-export default router;
+Cart_router.put("/update", updateItemController);
+
+
+Cart_router.delete("/:productId", deleteItemController);
+
+export default Cart_router;
