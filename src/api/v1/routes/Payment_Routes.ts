@@ -210,12 +210,12 @@ router.delete("/:id", deletePaymentController);
 
 /**
  * @swagger
- * /pay:
+ * /payments/pay:
  *   post:
  *     summary: Process payment for an order
  *     description: This endpoint processes the payment for a specific order using the provided payment information.
  *     tags:
- *       - Payment
+ *       - Payments
  *     requestBody:
  *       required: true
  *       content:

@@ -95,3 +95,6 @@
 ::1 - - [12/Apr/2026:01:37:38 +0000] "POST /api/v1/orders HTTP/1.1" 201 344 "-" "bruno-runtime/3.2.0"
 ::1 - - [12/Apr/2026:01:37:41 +0000] "POST /api/v1/payments HTTP/1.1" 201 213 "-" "bruno-runtime/3.2.0"
 ::1 - - [12/Apr/2026:01:37:45 +0000] "POST /api/v1/payments/pay HTTP/1.1" 200 372 "-" "bruno-runtime/3.2.0"
+::1 - - [12/Apr/2026:03:33:32 +0000] "POST /api/v1/products HTTP/1.1" 201 277 "-" "bruno-runtime/3.2.0"
+::1 - - [12/Apr/2026:03:33:38 +0000] "GET /api/v1/products HTTP/1.1" 200 449 "-" "bruno-runtime/3.2.0"
+::1 - - [12/Apr/2026:03:39:49 +0000] "GET /api/v1/api-docs/ HTTP/1.1" 404 155 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"

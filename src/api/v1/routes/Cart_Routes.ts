@@ -4,37 +4,35 @@ import { getCartController, addToCartController, updateItemController, deleteIte
 
 const Cart_router = express.Router();
 
-/**
- * @swagger
- * /users:
- *   post:
- *     summary: Create a new user
- *     description: Register a new user in the system
- *     tags:
- *       - Users
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *             properties:
- *               name:
- *                 type: string
- *                 example: John Doe
- *               email:
- *                 type: string
- *                 example: john@example.com
- *     responses:
- *       201:
- *         description: User created successfully
- *       400:
- *         description: Invalid input
- */
+ /**
+  * @swagger
+  * /carts:
+  *   get:
+  *     summary: Get user's cart items
+  *     description: Retrieve all products in the current user's shopping cart
+  *     tags:
+  *       - Cart
+  *     responses:
+  *       200:
+  *         description: Cart items retrieved successfully
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: array
+  *               items:
+  *                 type: object
+  *                 properties:
+  *                   productId:
+  *                     type: string
+  *                     example: "p123"
+  *                   quantity:
+  *                     type: integer
+  *                     example: 2
+  *       500:
+  *         description: Internal server error
+  */
 Cart_router.get("/", getCartController);
+
 
 /**
  * @swagger
