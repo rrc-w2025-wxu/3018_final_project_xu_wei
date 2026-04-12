@@ -1,7 +1,8 @@
 import * as firestoreRepository from "../repositories/Payment_Repository";
 import { Payment } from "../models/Payment_Model";
-import { getOrderService, updateOrderService } from "../services/Order_Service"
+import { getOrderService, updateOrderService } from "../services/Order_Service";
 import { Timestamp } from "firebase-admin/firestore";
+import { db } from "../../../../config/firebaseConfig";
 
 // ===== CRUD =====
 // Generate IDs like pay_000001
@@ -28,7 +29,8 @@ export const createPayment = async (data: Partial<Payment>): Promise<Payment> =>
             timestamp: data.timestamp ?? Timestamp.now(),
         };
 
-        await firestoreRepository.createPayment<Payment>("payments", paymentData, newId);
+        // Changed 'payments' to 'Payments'
+        await firestoreRepository.createPayment<Payment>("Payments", paymentData, newId);
 
         return paymentData;
     } catch (error: unknown) {
@@ -45,23 +47,24 @@ export const createPayment = async (data: Partial<Payment>): Promise<Payment> =>
  */
 export const getAllPayments = async (): Promise<Payment[]> => {
     try {
-        const allPayments = await firestoreRepository.getPayments("payments");
+        // Changed 'payments' to 'Payments'
+        const allPayments = await firestoreRepository.getPayments("Payments");
 
         return allPayments.docs.map((doc) => {
-          const data = doc.data();
+            const data = doc.data();
 
-          return {
-            id: doc.id,
-            orderId: data.orderId,
-            userId: data.userId,
-            amount: data.amount,
-            method: data.method,
-            status: data.status,
-            timestamp:
-              data.timestamp instanceof Timestamp
-                ? data.timestamp.toDate().toISOString()
-                : data.timestamp,
-          } as Payment;
+            return {
+                id: doc.id,
+                orderId: data.orderId,
+                userId: data.userId,
+                amount: data.amount,
+                method: data.method,
+                status: data.status,
+                timestamp:
+                    data.timestamp instanceof Timestamp
+                        ? data.timestamp.toDate().toISOString()
+                        : data.timestamp,
+            } as Payment;
         });
     } catch (error: unknown) {
         if (error instanceof Error) {
@@ -77,7 +80,8 @@ export const getAllPayments = async (): Promise<Payment[]> => {
  */
 export const getPayment = async (id: string): Promise<Payment | null> => {
     try {
-        const doc = await firestoreRepository.getPaymentById("payments", id);
+        // Changed 'payments' to 'Payments'
+        const doc = await firestoreRepository.getPaymentById("Payments", id);
         if (!doc || !doc.exists) return null;
 
         const data = doc.data();
@@ -91,9 +95,9 @@ export const getPayment = async (id: string): Promise<Payment | null> => {
             method: data.method,
             status: data.status,
             timestamp:
-              data.timestamp instanceof Timestamp
-                ? data.timestamp.toDate().toISOString()
-                : data.timestamp,
+                data.timestamp instanceof Timestamp
+                    ? data.timestamp.toDate().toISOString()
+                    : data.timestamp,
         } as Payment;
     } catch (error: unknown) {
         if (error instanceof Error) {
@@ -112,7 +116,8 @@ export const updatePayment = async (
   data: Partial<Payment>
 ): Promise<Payment | null> => {
     try {
-        const doc = await firestoreRepository.getPaymentById("payments", id);
+        // Changed 'payments' to 'Payments'
+        const doc = await firestoreRepository.getPaymentById("Payments", id);
         if (!doc || !doc.exists) return null;
 
         const existing = doc.data()!;
@@ -127,16 +132,17 @@ export const updatePayment = async (
             timestamp: data.timestamp ?? Timestamp.now(),
         };
 
-        await firestoreRepository.updatePayment<Payment>("payments", id, updatedPayment);
+        // Changed 'payments' to 'Payments'
+        await firestoreRepository.updatePayment<Payment>("Payments", id, updatedPayment);
 
         return updatedPayment;
-  } catch (error: unknown) {
-      if (error instanceof Error) {
-          throw new Error(`Failed to update payment: ${error.message}`);
-      } else {
-          throw new Error("Failed to update payment: Unknown error");
-      }
-  }
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to update payment: ${error.message}`);
+        } else {
+            throw new Error("Failed to update payment: Unknown error");
+        }
+    }
 };
 
 /**
@@ -144,7 +150,8 @@ export const updatePayment = async (
  */
 export const deletePayment = async (id: string): Promise<Payment | null> => {
     try {
-        const doc = await firestoreRepository.getPaymentById("payments", id);
+        // Changed 'payments' to 'Payments'
+        const doc = await firestoreRepository.getPaymentById("Payments", id);
         if (!doc || !doc.exists) return null;
 
         const data = doc.data()!;
@@ -157,12 +164,13 @@ export const deletePayment = async (id: string): Promise<Payment | null> => {
             method: data.method,
             status: data.status,
             timestamp:
-              data.timestamp instanceof Timestamp
-                ? data.timestamp.toDate()
-                : data.timestamp,
+                data.timestamp instanceof Timestamp
+                    ? data.timestamp.toDate()
+                    : data.timestamp,
         };
 
-        await firestoreRepository.deletePayment("payments", id);
+        // Changed 'payments' to 'Payments'
+        await firestoreRepository.deletePayment("Payments", id);
 
         return deletedPayment;
     } catch (error: unknown) {
@@ -175,24 +183,69 @@ export const deletePayment = async (id: string): Promise<Payment | null> => {
 };
 
 // ===== Business Logic =====
-export async function payOrderService(orderId: string) {
-    // Get order
-    const order = await getOrderService(orderId);
-    if (!order) throw new Error("Order not found");
+/**
+ * Pay order (industrial version)
+ */
+export async function payOrderService(orderId: string, userId: string) {
+    try {
+        // 1. Get order
+        const order = await getOrderService(orderId);
 
-    // Check status
-    if (order.status === "paid") {
-        throw new Error("Order already paid");
+        if (!order) {
+            throw new Error("Order not found");
+        }
+
+        // 2. Check ownership
+        if (order.userId !== userId) {
+            throw new Error("Unauthorized payment attempt");
+        }
+
+        // 3. Prevent duplicate payment
+        if (order.status === "paid") {
+            throw new Error("Order already paid");
+        }
+
+        // 4. Update order status → paid
+        const updatedOrder = await updateOrderService(orderId, {
+            paymentId: "pay_000001",
+            status: "paid",
+            updatedAt: Timestamp.now()
+        });
+
+        if (!updatedOrder) {
+            throw new Error("Failed to update order");
+        }
+
+        // Remove product paid
+        const cartQuery = await db.collection("carts").where("userId", "==", userId).get();
+        if (!cartQuery.empty) {
+            const cartDoc = cartQuery.docs[0];
+            const cartData = cartDoc.data();
+            const cartItems = cartData?.items || [];
+
+            // Get product id in order
+            const orderedProductIds = order.items.map((item: any) => item.productId);
+
+            // keep product that has not paid
+            const remainingItems = cartItems.filter(
+                (item: any) => !orderedProductIds.includes(item.productId)
+            );
+
+            // Update cart
+            await cartDoc.ref.update({ items: remainingItems });
+        }
+
+        // 6. Return result
+        return {
+            message: "Payment successful",
+            order: updatedOrder
+        };
+
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            throw new Error(`Payment failed: ${error.message}`);
+        } else {
+            throw new Error("Payment failed: Unknown error");
+        }
     }
-
-    // Update status
-    const updatedOrder = await updateOrderService(orderId, {
-        status: "paid",
-        updatedAt: Timestamp.now()
-    });
-
-    return {
-        message: "Payment successful",
-        order: updatedOrder
-    };
 }

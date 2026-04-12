@@ -1,5 +1,12 @@
 import { Request, Response } from "express";
-import * as paymentService from "../services/Payment_Service";
+import { 
+    createPayment, 
+    getAllPayments, 
+    getPayment, 
+    updatePayment, 
+    deletePayment, 
+    payOrderService 
+} from "../services/Payment_Service";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
 import { Payment } from "../models/Payment_Model";
 
@@ -11,7 +18,7 @@ export const createPaymentController = async (req: Request, res: Response) => {
     try {
         const data: Partial<Payment> = req.body;
 
-        const newPayment = await paymentService.createPayment(data);
+        const newPayment = await createPayment(data);
 
         res.status(HTTP_STATUS.CREATED).json({
         message: "Payment created",
@@ -39,7 +46,7 @@ export const getAllPaymentsController = async (
   res: Response
 ): Promise<void> => {
     try {
-        const payments = await paymentService.getAllPayments();
+        const payments = await getAllPayments();
 
         res.status(HTTP_STATUS.OK).json({
         message: "Payments retrieved",
@@ -76,7 +83,7 @@ export const getPaymentController = async (
             .json({ message: "Payment ID is required" });
         }
 
-        const payment = await paymentService.getPayment(id);
+        const payment = await getPayment(id);
 
         if (!payment) {
         return res
@@ -120,7 +127,7 @@ export const updatePaymentController = async (
 
         const data: Partial<Payment> = req.body;
 
-        const updatedPayment = await paymentService.updatePayment(id, data);
+        const updatedPayment = await updatePayment(id, data);
 
         if (!updatedPayment) {
         return res
@@ -162,7 +169,7 @@ export const deletePaymentController = async (
             .json({ message: "Payment ID is required" });
         }
 
-        const deletedPayment = await paymentService.deletePayment(id);
+        const deletedPayment = await deletePayment(id);
 
         if (!deletedPayment) {
         return res
@@ -185,4 +192,24 @@ export const deletePaymentController = async (
             .json({ message: "Unknown error" });
         }
     }
+};
+
+export const payOrderController = async (req: Request, res: Response) => {
+  try {
+    const { orderId, userId } = req.body;
+
+        if (!orderId || !userId) {
+            return res.status(400).json({ message: "orderId and userId are required" });
+        }
+
+    const result = await payOrderService(orderId, userId);
+
+    res.json(result);
+  } catch (err) {
+    console.error("🔥 CONTROLLER ERROR:", err); // 这里会打印具体错误信息
+    res.status(500).json({
+      message: "Payment failed",
+      error: err instanceof Error ? err.message : err
+    });
+  }
 };

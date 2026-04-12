@@ -91,7 +91,7 @@ export const updateOrderController = async (
     }
 
     const data: Partial<Order> = req.body;
-    const updatedOrder = await Service.updateOrderService(id, data);
+    const updatedOrder = await Service.updateOrderService(id, data,);
 
     if (!updatedOrder) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: "Order not found" });
