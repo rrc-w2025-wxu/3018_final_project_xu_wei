@@ -208,7 +208,58 @@ router.put("/:id", updatePaymentController);
  */
 router.delete("/:id", deletePaymentController);
 
-
+/**
+ * @swagger
+ * /pay:
+ *   post:
+ *     summary: Process payment for an order
+ *     description: This endpoint processes the payment for a specific order using the provided payment information.
+ *     tags:
+ *       - Payment
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - orderId
+ *               - amount
+ *               - paymentMethod
+ *             properties:
+ *               orderId:
+ *                 type: string
+ *                 description: The ID of the order to be paid
+ *                 example: "64f1c2a9b1234567890abcd"
+ *               amount:
+ *                 type: number
+ *                 description: Total payment amount
+ *                 example: 99.99
+ *               paymentMethod:
+ *                 type: string
+ *                 description: Payment method used (e.g., card, PayPal)
+ *                 example: "card"
+ *     responses:
+ *       200:
+ *         description: Payment processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Payment successful
+ *                 data:
+ *                   type: object
+ *       400:
+ *         description: Invalid request data
+ *       500:
+ *         description: Internal server error
+ */
 router.post("/pay", payOrderController);
 
 export default router;

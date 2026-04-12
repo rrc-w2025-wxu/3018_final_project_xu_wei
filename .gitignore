@@ -1,3 +1,8 @@
 node_modules/
 dist/
+
+# 日志文件
+*.log
+npm-debug.log*
+
 final-project-xu-wei-firebase-adminsdk-fbsvc-3f245237c1.json

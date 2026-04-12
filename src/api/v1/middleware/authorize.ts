@@ -4,6 +4,19 @@ import { AuthorizationOptions } from "../models/authorizationOptions";
 import { MiddlewareFunction } from "../types/expressTypes";
 import { HTTP_STATUS } from "../../../constants/httpConstants";
 
+/**
+ * Authorization middleware factory
+ * 
+ * Creates a middleware to control access based on user role and ownership.
+ * 
+ * Features:
+ * - Allows access if user is accessing their own resource (allowSameUser)
+ * - Allows access if user has one of the required roles (hasRole)
+ * - Returns 403 if authorization fails
+ * 
+ * Usage:
+ * isAuthorized({ allowSameUser: true, hasRole: ["admin"] })
+ */
 const isAuthorized = (opts: AuthorizationOptions): MiddlewareFunction => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {

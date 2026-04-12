@@ -1,4 +1,5 @@
 import express from "express";
+import { apiAnalyticsMiddleware, getApiStats } from '../src/api/v1/middleware/apiAnalytics'; 
 import setupSwagger from "../config/swagger";
 import morgan from "morgan";
 
@@ -18,6 +19,12 @@ import Cart_router from "./api/v1/routes/Cart_Routes";
  * Initialize Express application
  */
 const app = express();
+
+// Enable API analytics middleware globally (all APIs will be analyzed)
+app.use(apiAnalyticsMiddleware);
+
+// Provide an interface for viewing statistical data
+app.get('/api/stats', getApiStats);
 
 // Initialize Swagger API documentation
 setupSwagger(app);

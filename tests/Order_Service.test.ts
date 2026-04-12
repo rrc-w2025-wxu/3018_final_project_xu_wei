@@ -1,143 +1,259 @@
-// src/services/__tests__/Order_Service.test.ts
-import * as Service from "../src/api/v1/services/Order_Service";
+
+import {
+    createOrderService,
+    getAllOrdersService,
+    getOrderService,
+    updateOrderService,
+    deleteOrderService,
+    createOrderFromCartService
+} from "../src/api/v1/services/Order_Service";
+
 import * as firestoreRepository from "../src/api/v1/repositories/Order_Repository";
-import { Order } from "../src/api/v1/models/Order_Model";
-import { OrderItem } from "../src/api/v1/models/Order_Item_Model";
-import { Timestamp } from "firebase-admin/firestore";
+import { getProductById } from "../src/api/v1/repositories/Product_Repository";
+import { getByUserId as getCartByUserId } from "../src/api/v1/repositories/Cart_Repository";
+import { getByCartId } from "../src/api/v1/repositories/CartItem_Repository";
 
-// Mock the Firestore repository
 jest.mock("../src/api/v1/repositories/Order_Repository");
+jest.mock("../src/api/v1/repositories/Product_Repository");
+jest.mock("../src/api/v1/repositories/Cart_Repository");
+jest.mock("../src/api/v1/repositories/CartItem_Repository");
 
-describe("Order Service", () => {
-  const mockOrder: Order = {
-    id: "order_000001",
-    userId: "user_123",
-    items: [{ productId: "prod_1", quantity: 2 } as OrderItem],
-    total: 100,
-    status: "pending",
-    paymentId: "pay_123",
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now(),
-  };
+describe("Order Service Unit Tests", () => {
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-  // ==========================
-  // createOrderService
-  // ==========================
-  it("should create a new order", async () => {
-    (firestoreRepository.createOrder as jest.Mock).mockResolvedValueOnce(true);
+    // =========================
+    // CREATE ORDER
+    // =========================
+    describe("createOrderService", () => {
+        it("should create order successfully", async () => {
+            (firestoreRepository.createOrder as jest.Mock).mockResolvedValue(true);
 
-    const data: Partial<Order> = {
-      userId: "user_123",
-      items: [{ productId: "prod_1", quantity: 2 } as OrderItem],
-      total: 100,
-    };
+            const result = await createOrderService({
+                userId: "user1",
+                items: [
+                    { productId: "p1", quantity: 2, price: 10 }
+                ]
+            });
 
-    const created = await Service.createOrderService(data);
+            expect(result.id).toBeDefined();
+            expect(result.total).toBe(20);
+            expect(result.status).toBe("pending");
+            expect(firestoreRepository.createOrder).toHaveBeenCalledTimes(1);
+        });
 
-    expect(created.id).toMatch(/^order_\d{6}$/);
-    expect(created.userId).toBe(data.userId);
-    expect(created.items).toEqual(data.items);
-    expect(created.total).toBe(data.total);
-    expect(firestoreRepository.createOrder).toHaveBeenCalledTimes(1);
-  });
+        it("should throw error when missing userId", async () => {
+            await expect(
+                createOrderService({ items: [] })
+            ).rejects.toThrow("userId is required");
+        });
 
-  // ==========================
-  // getAllOrdersService
-  // ==========================
-  it("should retrieve all orders", async () => {
-    const mockDocs = [
-      {
-        id: "order_000001",
-        data: () => mockOrder,
-      },
-      {
-        id: "order_000002",
-        data: () => ({ ...mockOrder, id: "order_000002" }),
-      },
-    ];
-    (firestoreRepository.getOrders as jest.Mock).mockResolvedValueOnce({ docs: mockDocs });
+        it("should throw error when items empty", async () => {
+            await expect(
+                createOrderService({ userId: "u1", items: [] })
+            ).rejects.toThrow("items are required");
+        });
+    });
 
-    const result = await Service.getAllOrdersService();
+    // =========================
+    // GET ALL
+    // =========================
+    describe("getAllOrdersService", () => {
+        it("should return all orders", async () => {
+            (firestoreRepository.getOrders as jest.Mock).mockResolvedValue({
+                docs: [
+                    {
+                        id: "order_000001",
+                        data: () => ({
+                            userId: "u1",
+                            items: [],
+                            total: 0,
+                            status: "pending"
+                        })
+                    }
+                ]
+            });
 
-    expect(result.length).toBe(2);
-    expect(result[0].id).toBe("order_000001");
-    expect(firestoreRepository.getOrders).toHaveBeenCalledWith("orders");
-  });
+            const result = await getAllOrdersService();
 
-  // ==========================
-  // getOrderService
-  // ==========================
-  it("should retrieve an order by ID", async () => {
-    const mockDoc = {
-      id: mockOrder.id,
-      exists: true,
-      data: () => mockOrder,
-    };
-    (firestoreRepository.getOrderById as jest.Mock).mockResolvedValueOnce(mockDoc);
+            expect(result.length).toBe(1);
+            expect(result[0].id).toBe("order_000001");
+        });
 
-    const result = await Service.getOrderService(mockOrder.id!);
+        it("should throw error on failure", async () => {
+            (firestoreRepository.getOrders as jest.Mock).mockRejectedValue(
+                new Error("DB error")
+            );
 
-    expect(result).not.toBeNull();
-    expect(result!.id).toBe(mockOrder.id);
-    expect(firestoreRepository.getOrderById).toHaveBeenCalledWith("orders", mockOrder.id);
-  });
+            await expect(getAllOrdersService())
+                .rejects
+                .toThrow("Failed to retrieve orders: DB error");
+        });
+    });
 
-  it("should return null if order does not exist", async () => {
-    (firestoreRepository.getOrderById as jest.Mock).mockResolvedValueOnce({ exists: false });
+    // =========================
+    // GET ONE
+    // =========================
+    describe("getOrderService", () => {
+        it("should return order by id", async () => {
+            (firestoreRepository.getOrderById as jest.Mock).mockResolvedValue({
+                id: "order_1",
+                exists: true,
+                data: () => ({
+                    userId: "u1",
+                    items: [],
+                    total: 100,
+                    status: "pending"
+                })
+            });
 
-    const result = await Service.getOrderService("non_existing_id");
-    expect(result).toBeNull();
-  });
+            const result = await getOrderService("order_1");
 
-  // ==========================
-  // updateOrderService
-  // ==========================
-  it("should update an existing order", async () => {
-    const mockDoc = {
-      id: mockOrder.id,
-      exists: true,
-      data: () => mockOrder,
-    };
-    (firestoreRepository.getOrderById as jest.Mock).mockResolvedValueOnce(mockDoc);
-    (firestoreRepository.updateOrder as jest.Mock).mockResolvedValueOnce(true);
+            expect(result?.id).toBe("order_1");
+        });
 
-    const updatedData: Partial<Order> = { status: "paid" };
-    const updated = await Service.updateOrderService(mockOrder.id!, updatedData);
+        it("should return null if not found", async () => {
+            (firestoreRepository.getOrderById as jest.Mock).mockResolvedValue({
+                exists: false
+            });
 
-    expect(updated!.status).toBe("paid");
-    expect(firestoreRepository.updateOrder).toHaveBeenCalledWith("orders", mockOrder.id, expect.any(Object));
-  });
+            const result = await getOrderService("bad");
 
-  it("should return null if order to update does not exist", async () => {
-    (firestoreRepository.getOrderById as jest.Mock).mockResolvedValueOnce({ exists: false });
-    const result = await Service.updateOrderService("non_existing_id", { status: "paid" });
-    expect(result).toBeNull();
-  });
+            expect(result).toBeNull();
+        });
+    });
 
-  // ==========================
-  // deleteOrderService
-  // ==========================
-  it("should delete an existing order", async () => {
-    const mockDoc = {
-      id: mockOrder.id,
-      exists: true,
-      data: () => mockOrder,
-    };
-    (firestoreRepository.getOrderById as jest.Mock).mockResolvedValueOnce(mockDoc);
-    (firestoreRepository.deleteOrder as jest.Mock).mockResolvedValueOnce(true);
+    // =========================
+    // UPDATE
+    // =========================
+    describe("updateOrderService", () => {
+        it("should update order successfully", async () => {
+            (firestoreRepository.getOrderById as jest.Mock).mockResolvedValue({
+                id: "order_1",
+                exists: true,
+                data: () => ({
+                    userId: "u1",
+                    items: [],
+                    total: 100,
+                    status: "pending"
+                })
+            });
 
-    const deleted = await Service.deleteOrderService(mockOrder.id!);
-    expect(deleted!.id).toBe(mockOrder.id);
-    expect(firestoreRepository.deleteOrder).toHaveBeenCalledWith("orders", mockOrder.id);
-  });
+            (firestoreRepository.updateOrder as jest.Mock).mockResolvedValue(true);
 
-  it("should return null if order to delete does not exist", async () => {
-    (firestoreRepository.getOrderById as jest.Mock).mockResolvedValueOnce({ exists: false });
-    const result = await Service.deleteOrderService("non_existing_id");
-    expect(result).toBeNull();
-  });
+            const result = await updateOrderService("order_1", {
+                status: "paid"
+            });
+
+            expect(result?.status).toBe("paid");
+            expect(firestoreRepository.updateOrder).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return null if order not exists", async () => {
+            (firestoreRepository.getOrderById as jest.Mock).mockResolvedValue({
+                exists: false
+            });
+
+            const result = await updateOrderService("x", {
+                status: "paid"
+            });
+
+            expect(result).toBeNull();
+        });
+    });
+
+    // =========================
+    // DELETE
+    // =========================
+    describe("deleteOrderService", () => {
+        it("should delete order successfully", async () => {
+            (firestoreRepository.getOrderById as jest.Mock).mockResolvedValue({
+                id: "order_1",
+                exists: true,
+                data: () => ({
+                    userId: "u1",
+                    items: [],
+                    total: 100,
+                    status: "pending"
+                })
+            });
+
+            (firestoreRepository.deleteOrder as jest.Mock).mockResolvedValue(true);
+
+            const result = await deleteOrderService("order_1");
+
+            expect(result?.id).toBe("order_1");
+            expect(firestoreRepository.deleteOrder).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return null if not found", async () => {
+            (firestoreRepository.getOrderById as jest.Mock).mockResolvedValue({
+                exists: false
+            });
+
+            const result = await deleteOrderService("bad");
+
+            expect(result).toBeNull();
+        });
+    });
+
+    // =========================
+    // CART -> ORDER
+    // =========================
+    describe("createOrderFromCartService", () => {
+        it("should create order from cart", async () => {
+            (getCartByUserId as jest.Mock).mockResolvedValue({
+                id: "cart1"
+            });
+
+            (getByCartId as jest.Mock).mockResolvedValue([
+                { productId: "p1", quantity: 2 }
+            ]);
+
+            (getProductById as jest.Mock).mockResolvedValue({
+                id: "p1",
+                price: 50
+            });
+
+            (firestoreRepository.createOrder as jest.Mock).mockResolvedValue(true);
+
+            const result = await createOrderFromCartService("user1");
+
+            expect(result.total).toBe(100);
+            expect(result.items.length).toBe(1);
+        });
+
+        it("should throw if cart not found", async () => {
+            (getCartByUserId as jest.Mock).mockResolvedValue(null);
+
+            await expect(
+                createOrderFromCartService("user1")
+            ).rejects.toThrow("Cart not found");
+        });
+
+        it("should throw if cart empty", async () => {
+            (getCartByUserId as jest.Mock).mockResolvedValue({ id: "c1" });
+            (getByCartId as jest.Mock).mockResolvedValue([]);
+
+            await expect(
+                createOrderFromCartService("user1")
+            ).rejects.toThrow("Cart is empty");
+        });
+
+        it("should throw if product missing", async () => {
+            (getCartByUserId as jest.Mock).mockResolvedValue({ id: "c1" });
+
+            (getByCartId as jest.Mock).mockResolvedValue([
+                { productId: "p1", quantity: 1 }
+            ]);
+
+            (getProductById as jest.Mock).mockResolvedValue(null);
+
+            await expect(
+                createOrderFromCartService("user1")
+            ).rejects.toThrow("Product not found: p1");
+        });
+    });
 });

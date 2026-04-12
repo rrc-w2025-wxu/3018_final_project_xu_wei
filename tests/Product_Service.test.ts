@@ -9,165 +9,174 @@ import {
 import { productRepository } from "../src/api/v1/repositories/Product_Repository";
 import { Timestamp } from "firebase-admin/firestore";
 
-// mock repository
-jest.mock("../src/api/v1/repositories/Product_Repository");
+// Mock repository
+jest.mock("../src/api/v1/repositories/Product_Repository", () => ({
+    productRepository: {
+        createProduct: jest.fn(),
+        getProducts: jest.fn(),
+        getProductById: jest.fn(),
+        updateProduct: jest.fn(),
+        deleteProduct: jest.fn(),
+    }
+}));
 
-describe("Product Service", () => {
+describe("Product Service Unit Tests", () => {
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  /**
-   * CREATE
-   */
-  it("should create a product", async () => {
-    (productRepository.createProduct as jest.Mock).mockResolvedValue({});
-
-    const result = await createProductService({
-      name: "Test Product",
-      description: "Test Desc",
-      price: 10,
-      stock: 5,
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    expect(result.name).toBe("Test Product");
-    expect(result.id).toBeDefined();
-    expect(productRepository.createProduct).toHaveBeenCalled();
-  });
+    // =========================
+    // createProductService
+    // =========================
+    describe("createProductService", () => {
+        it("should create a product successfully", async () => {
+            (productRepository.createProduct as jest.Mock).mockResolvedValue(true);
 
-  /**
-   * GET ALL
-   */
-  it("should return all products", async () => {
-    const mockDocs = [
-      {
-        id: "prod_000001",
-        data: () => ({
-          name: "Product 1",
-          description: "Desc",
-          price: 10,
-          stock: 5,
-          createdAt: Timestamp.now(),
-          updatedAt: Timestamp.now(),
-        }),
-      },
-    ];
+            const data = {
+                name: "iPhone",
+                description: "Apple phone",
+                price: 1000,
+                stock: 10,
+                category: "electronics"
+            };
 
-    (productRepository.getProducts as jest.Mock).mockResolvedValue({
-      docs: mockDocs,
+            const result = await createProductService(data);
+
+            expect(result).toHaveProperty("id");
+            expect(result.name).toBe("iPhone");
+            expect(productRepository.createProduct).toHaveBeenCalledTimes(1);
+        });
+
+        it("should handle error when create fails", async () => {
+            (productRepository.createProduct as jest.Mock).mockRejectedValue(
+                new Error("DB error")
+            );
+
+            await expect(
+                createProductService({ name: "test" })
+            ).rejects.toThrow("Failed to create product: DB error");
+        });
     });
 
-    const result = await getAllProductsService();
+    // =========================
+    // getAllProductsService
+    // =========================
+    describe("getAllProductsService", () => {
+        it("should return all products", async () => {
+            const mockDocs = {
+                docs: [
+                    {
+                        id: "prod_000001",
+                        data: () => ({
+                            name: "A",
+                            price: 10,
+                            createdAt: Timestamp.now(),
+                            updatedAt: Timestamp.now()
+                        })
+                    }
+                ]
+            };
 
-    expect(result.length).toBe(1);
-    expect(result[0].name).toBe("Product 1");
-  });
+            (productRepository.getProducts as jest.Mock).mockResolvedValue(mockDocs);
 
-  /**
-   * GET BY ID
-   */
-  it("should return a product by id", async () => {
-    (productRepository.getProductById as jest.Mock).mockResolvedValue({
-      id: "prod_000001",
-      exists: true,
-      data: () => ({
-        name: "Product 1",
-        description: "Desc",
-        price: 10,
-        stock: 5,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-      }),
+            const result = await getAllProductsService();
+
+            expect(result.length).toBe(1);
+            expect(result[0].id).toBe("prod_000001");
+        });
+
+        it("should throw error when fetch fails", async () => {
+            (productRepository.getProducts as jest.Mock).mockRejectedValue(
+                new Error("DB error")
+            );
+
+            await expect(getAllProductsService()).rejects.toThrow(
+                "Failed to retrieve products: DB error"
+            );
+        });
     });
 
-    const result = await getProductService("prod_000001");
+    // =========================
+    // getProductService
+    // =========================
+    describe("getProductService", () => {
+        it("should return product by id", async () => {
+            (productRepository.getProductById as jest.Mock).mockResolvedValue({
+                id: "prod_000001",
+                name: "Test Product"
+            });
 
-    expect(result).not.toBeNull();
-    expect(result?.name).toBe("Product 1");
-  });
+            const result = await getProductService("prod_000001");
 
-  it("should return null if product not found", async () => {
-    (productRepository.getProductById as jest.Mock).mockResolvedValue({
-      exists: false,
+            expect(result).not.toBeNull();
+            expect(result?.name).toBe("Test Product");
+        });
+
+        it("should return null if product not found", async () => {
+            (productRepository.getProductById as jest.Mock).mockResolvedValue(null);
+
+            const result = await getProductService("not_exist");
+
+            expect(result).toBeNull();
+        });
     });
 
-    const result = await getProductService("invalid_id");
+    // =========================
+    // updateProductService
+    // =========================
+    describe("updateProductService", () => {
+        it("should update product successfully", async () => {
+            (productRepository.getProductById as jest.Mock).mockResolvedValue({
+                id: "prod_000001",
+                name: "Old"
+            });
 
-    expect(result).toBeNull();
-  });
+            (productRepository.updateProduct as jest.Mock).mockResolvedValue(true);
 
-  /**
-   * UPDATE
-   */
-  it("should update a product", async () => {
-    (productRepository.getProductById as jest.Mock).mockResolvedValue({
-      id: "prod_000001",
-      exists: true,
-      data: () => ({
-        name: "Old",
-        description: "Old desc",
-        price: 10,
-        stock: 5,
-        createdAt: Timestamp.now(),
-      }),
+            const result = await updateProductService("prod_000001", {
+                name: "New Name"
+            });
+
+            expect(result?.name).toBe("New Name");
+            expect(productRepository.updateProduct).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return null if product not exists", async () => {
+            (productRepository.getProductById as jest.Mock).mockResolvedValue(null);
+
+            const result = await updateProductService("invalid", {
+                name: "New"
+            });
+
+            expect(result).toBeNull();
+        });
     });
 
-    (productRepository.updateProduct as jest.Mock).mockResolvedValue(undefined);
+    // =========================
+    // deleteProduct
+    // =========================
+    describe("deleteProduct", () => {
+        it("should delete product successfully", async () => {
+            (productRepository.getProductById as jest.Mock).mockResolvedValue({
+                id: "prod_000001",
+                name: "To Delete"
+            });
 
-    const result = await updateProductService("prod_000001", {
-      name: "Updated",
+            (productRepository.deleteProduct as jest.Mock).mockResolvedValue(true);
+
+            const result = await deleteProduct("prod_000001");
+
+            expect(result?.id).toBe("prod_000001");
+            expect(productRepository.deleteProduct).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return null if product not found", async () => {
+            (productRepository.getProductById as jest.Mock).mockResolvedValue(null);
+
+            const result = await deleteProduct("wrong");
+
+            expect(result).toBeNull();
+        });
     });
-
-    expect(result).not.toBeNull();
-    expect(result?.name).toBe("Updated");
-    expect(productRepository.updateProduct).toHaveBeenCalled();
-  });
-
-  it("should return null if update product not found", async () => {
-    (productRepository.getProductById as jest.Mock).mockResolvedValue({
-      exists: false,
-    });
-
-    const result = await updateProductService("invalid_id", { name: "Test" });
-
-    expect(result).toBeNull();
-  });
-
-  /**
-   * DELETE
-   */
-  it("should delete a product", async () => {
-    (productRepository.getProductById as jest.Mock).mockResolvedValue({
-      id: "prod_000001",
-      exists: true,
-      data: () => ({
-        name: "Product",
-        description: "Desc",
-        price: 10,
-        stock: 5,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-      }),
-    });
-
-    (productRepository.deleteProduct as jest.Mock).mockResolvedValue(undefined);
-
-    const result = await deleteProduct("prod_000001");
-
-    expect(result).not.toBeNull();
-    expect(result?.id).toBe("prod_000001");
-    expect(productRepository.deleteProduct).toHaveBeenCalled();
-  });
-
-  it("should return null if delete product not found", async () => {
-    (productRepository.getProductById as jest.Mock).mockResolvedValue({
-      exists: false,
-    });
-
-    const result = await deleteProduct("invalid_id");
-
-    expect(result).toBeNull();
-  });
-
 });

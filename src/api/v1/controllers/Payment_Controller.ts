@@ -194,6 +194,11 @@ export const deletePaymentController = async (
     }
 };
 
+/**
+ * Process payment for an order
+ * POST /pay
+ * Requires: orderId, userId in request body
+ */
 export const payOrderController = async (req: Request, res: Response) => {
   try {
     const { orderId, userId } = req.body;

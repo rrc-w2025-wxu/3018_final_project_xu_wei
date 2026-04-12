@@ -5,14 +5,14 @@ import { getProductById } from "../repositories/Product_Repository";
 import { getByUserId as getCartByUserId } from "../repositories/Cart_Repository";
 import { getByCartId } from "../repositories/CartItem_Repository";
 
-// ===== ID Generator =====
+// ID Generator
 let orderCounter = 0;
 const generateOrderId = (): string => {
     orderCounter += 1;
     return `order_${orderCounter.toString().padStart(6, "0")}`;
 };
 
-// ===== CREATE ORDER =====
+// CREATE ORDER
 export const createOrderService = async (
     data: Partial<Order>
 ): Promise<Order> => {
@@ -36,7 +36,6 @@ export const createOrderService = async (
             status: "pending",
             createdAt: Timestamp.now(),
             updatedAt: Timestamp.now(),
-            // ❗ paymentId 不写（避免 undefined bug）
         };
 
         await firestoreRepository.createOrder<Order>(
